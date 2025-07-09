@@ -1,0 +1,268 @@
+from django.db import models
+from user.models import User
+
+
+class Camera (models.Model):
+    name = models.CharField(
+        max_length=255,
+        null= True,
+        blank= True,
+        verbose_name='نام')
+
+    resolution = models.CharField(
+        max_length=255,
+        null= True,
+        blank= True,
+        verbose_name='رزولوشن')
+
+    description = models.TextField(
+        null= True,
+        blank= True,
+        verbose_name='توضیحات')
+
+    class Meta:
+        verbose_name = ("دوربین")
+        verbose_name_plural = ("دوربین ها")
+
+    def __str__(self):
+        return self.name
+
+
+class Picture (models.Model):
+    file = models.FileField(
+        upload_to=('product/picture/'),
+        null=True,
+        blank=True,
+        verbose_name='تصویر'
+    )
+
+    name =  models.CharField(
+        max_length=255,
+        null= True,
+        blank= True,
+        verbose_name='نام تصویر')
+
+    class Meta:
+        verbose_name = ("تصویر")
+        verbose_name_plural = ("تصاویر")
+
+    def __str__(self):
+        return self.name
+
+
+class Product (models.Model):
+    name = models.CharField(
+        max_length=255,
+        null= True,
+        blank= True,
+        verbose_name='نام محصول')
+
+    description = models.TextField(
+        null= True,
+        blank= True,
+        verbose_name='توضیحات')
+
+    price = models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='قیمت')
+
+    brand  =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='برند')
+
+    color =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='رنگ')
+
+    camera = models.ForeignKey(
+        Camera,
+        on_delete=models.SET_NULL,
+        related_name='product_cmaera',
+        verbose_name='دوربین'
+    )
+
+    picture = models.ForeignKey(
+        Picture,
+        on_delete=models.SET_NULL,
+        related_name='product_picture',
+        verbose_name='تصاویر'
+    )
+
+    part_number =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='پارت نامبر')
+
+    ram =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='حافظه')
+
+    sim_card =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='تعداد سیم کارت')
+
+    battry =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='باتری')
+
+    battry_health =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='سلامت باتری')
+
+    battry_change =models.BooleanField (
+        default= False,
+        verbose_name='باتری تعویض شده'
+    )
+
+    size =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='سایز')
+
+    charger =models.BooleanField (
+        default= False,
+        verbose_name='شارژر'
+    )
+
+    carton =models.BooleanField (
+        default= False,
+        verbose_name='کارتن'
+    )
+
+    TYPE_PRODUCT = [
+        ('new','نو'),
+        ('as new','در حد نو'),
+        ('used','دست دوم'),
+    ]
+
+    type_product =models.CharField(
+        max_length=25,
+        choices=TYPE_PRODUCT,
+        null= True,
+        blank= True,
+        verbose_name='وضعیت محصول')
+
+    technical_problem = models.TextField(
+        null= True,
+        blank= True,
+        verbose_name='مشکل فنی')
+
+    hit_product = models.BooleanField (
+        default= False,
+        verbose_name='ضرب خوردگی'
+    )
+
+    register_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='تاریخ رجیستری'
+    )
+
+    registered = models.BooleanField (
+        default= False,
+        verbose_name='رجیستر شده'
+    )
+
+    GUARANTOR = [
+        ('guarantor','گارانتی'),
+        ('guarantor_registered','رجیستر شده و گارانتی'),
+        ('disregistered','بدون رجیستری')
+    ]
+    guarantor = models.CharField(
+        max_length=25,
+        choices=GUARANTOR,
+        null= True,
+        blank= True,
+        verbose_name='گارانتی و رجیستری ')
+
+
+    repaired = models.BooleanField (
+        default= False,
+        verbose_name='تعمیر شده'
+    )
+
+    STATUS_PRODUCT =[
+        ('open','باز'),
+        ('saled','فروخته شده'),
+        ('canseled','کنسل شده'),
+        ('reserved','رزرو'),
+    ]
+
+    status_product = models.CharField(
+        max_length=25,
+        choices=STATUS_PRODUCT,
+        null= True,
+        blank= True,
+        verbose_name='وضعیت فروش محصول')
+
+
+    class Meta:
+        verbose_name = ("محصول")
+        verbose_name_plural = ("محصولات")
+
+    def __str__(self):
+        return self.name
+
+
+class Order (models.Model) :
+    product = models.ForeignKey(
+        Product,
+        related_name='order_product',
+        verbose_name='محصول'
+    )
+
+    buyer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='order_buyer',
+        verbose_name='خریدار'
+    )
+
+    seller = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='order_seller',
+        verbose_name='فروشنده'
+    )
+
+    sell_date =models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='تاریخ فروش'
+    )
+
+    STATUS =[
+        ('approved','تکمیل سفارش'),
+        ('confirmed','تایید سفارش'),
+        ('ordering','در حال سفارش'),
+        ('canceled','کنسل شده'),
+    ]
+    status =models.CharField(
+        max_length=25,
+        choices=STATUS,
+        null= True,
+        blank= True,
+        verbose_name='وضعیت سفارش')
+
+    class Meta:
+        verbose_name = ("سفارش")
+        verbose_name_plural = ("سفارشات")
+
+    def __str__(self):
+        return f"Order: {self.product.name} by {self.buyer.username} from {self.seller.username}"
