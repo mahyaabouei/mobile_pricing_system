@@ -19,6 +19,13 @@ class Camera (models.Model):
         null= True,
         blank= True,
         verbose_name='توضیحات')
+    
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
 
     class Meta:
         verbose_name = ("دوربین")
@@ -42,6 +49,12 @@ class Picture (models.Model):
         blank= True,
         verbose_name='نام تصویر')
 
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
     class Meta:
         verbose_name = ("تصویر")
         verbose_name_plural = ("تصاویر")
@@ -51,6 +64,13 @@ class Picture (models.Model):
 
 
 class Product (models.Model):
+    seller = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='product_seller',
+        verbose_name='فروشنده'
+    )
+
     name = models.CharField(
         max_length=255,
         null= True,
@@ -211,6 +231,12 @@ class Product (models.Model):
         blank= True,
         verbose_name='وضعیت فروش محصول')
 
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
 
     class Meta:
         verbose_name = ("محصول")
@@ -259,6 +285,13 @@ class Order (models.Model) :
         null= True,
         blank= True,
         verbose_name='وضعیت سفارش')
+    
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
 
     class Meta:
         verbose_name = ("سفارش")

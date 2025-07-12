@@ -17,20 +17,23 @@ class PictureAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'brand', 'price', 'color', 'type_product', 'status_product', 'registered', 'guarantor')
+    list_display = ('name', 'seller','brand', 'price', 'color', 'type_product', 'status_product', 'registered', 'guarantor')
     search_fields = ('name', 'brand', 'part_number')
     list_filter = ('type_product', 'status_product', 'brand', 'registered', 'guarantor', 'repaired', 'hit_product')
     list_editable = ('status_product', 'registered')
     ordering = ('-id',)
     autocomplete_fields = ('camera', 'picture')
     fieldsets = (
-        (None, {'fields': ('name', 'description', 'price', 'brand', 'color')}),
+        (None, {'fields': ('name', 'description', 'price', 'brand', 'color','seller')}),
         ('اطلاعات فنی', {
             'fields': (
                 'camera', 'picture', 'part_number', 'ram', 'sim_card',
                 'battry', 'battry_health', 'battry_change',
                 'size', 'charger', 'carton'
             )
+        }),
+        ('فروشنده', {
+            'fields': ('seller',)
         }),
         ('وضعیت محصول', {
             'fields': (
