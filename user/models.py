@@ -31,7 +31,7 @@ class User(AbstractUser):
         blank=True,
         verbose_name='ایمیل')
 
-    phone = models.CharField(
+    mobile = models.CharField(
         max_length=255,
         null=True,
         blank=True,
@@ -108,3 +108,10 @@ class User(AbstractUser):
         return f"{self.username}"
 
 
+class Otp(models.Model):
+    phone = models.CharField(max_length=255)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.phone} - {self.otp}"

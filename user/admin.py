@@ -16,3 +16,11 @@ class UserAdmin(BaseUserAdmin):
         ('سطح دسترسی', {'fields': ('admin', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
         ('وضعیت', {'fields': ('work_guarantee', 'last_login', 'created_at', 'updated_at')}),
     )
+
+
+@admin.register(Otp)
+class OtpAdmin(admin.ModelAdmin):
+    list_display = ('phone', 'otp', 'created_at')
+    search_fields = ('phone', 'otp')
+    list_filter = ('created_at',)
+    ordering = ('-created_at',)
