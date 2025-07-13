@@ -6,9 +6,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny , IsAuthenticated
 import datetime
+from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import MultiPartParser, FormParser
+from .serializers import CameraInputSerializer , PictureInputSerializer , ProductInputSerializer , OrderInputSerializer
 
 class CameraViewSet(APIView):
     permission_classes = [IsAuthenticated]
+    @extend_schema(request=CameraInputSerializer)
     def post (self,request):
         serializer = CameraSerializer(data=request.data)
         if serializer.is_valid():
@@ -31,6 +35,8 @@ class CameraViewSet(APIView):
 
 class PictureViewSet(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    @extend_schema(request=PictureInputSerializer)
     def post (self,request):
         serializer = PictureSerializer(data=request.data)
         if serializer.is_valid():
@@ -51,6 +57,7 @@ class PictureViewSet(APIView):
 
 class ProductViewSet(APIView):
     permission_classes = [IsAuthenticated]
+    @extend_schema(request=ProductInputSerializer)
     def post (self,request):
         request.data['seller'] = request.user.id
         serializer = ProductSerializer(data=request.data) 
@@ -91,6 +98,7 @@ class ProductViewSet(APIView):
 
 class OrderViewSet(APIView):
     permission_classes = [IsAuthenticated]
+    @extend_schema(request=OrderInputSerializer)
     def post (self,request):
         product = Product.objects.filter(id=request.data['product']).first()
         if not product :
