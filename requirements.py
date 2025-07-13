@@ -1,4 +1,6 @@
-# djangorestframework==3.14.0
-# Django==4.2.7
-# django-cors-headers==4.5.0
-#  djangorestframework-simplejwt
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers
+djangorestframework-simplejwt
+drf-spectacular
+psycopg2-binary
