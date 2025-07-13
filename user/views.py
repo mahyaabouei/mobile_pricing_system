@@ -18,7 +18,7 @@ class OtpView(APIView):
         if not mobile:
             return Response({'error': 'mobile is required'}, status=status.HTTP_400_BAD_REQUEST)
         otp = random.randint(100000, 999999)
-        otp = Otp.objects.create(phone=mobile, otp=otp)
+        otp = Otp.objects.create(mobile=mobile, otp=otp)
         Message(otp,mobile).otpSMS()
         return Response({'message': 'OTP sent to mobile'}, status=status.HTTP_200_OK) 
 
@@ -30,7 +30,7 @@ class LoginView(APIView):
         otp = request.data.get('otp')
         if not mobile or not otp:
             return Response({'error': 'mobile and otp are required'}, status=status.HTTP_400_BAD_REQUEST)
-        otp = Otp.objects.filter(phone=mobile, otp=otp).first()
+        otp = Otp.objects.filter(mobile=mobile, otp=otp).first()
         if not otp:
             return Response({'error': 'invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
         otp.delete()
@@ -51,7 +51,7 @@ class RegisterView(APIView):
         if not mobile or not otp:
             return Response({'error': 'mobile and otp are required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        otp = Otp.objects.filter(phone=mobile, otp=otp).first()
+        otp = Otp.objects.filter(mobile=mobile, otp=otp).first()
         if not otp:
             return Response({'error': 'invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
         otp.delete()
