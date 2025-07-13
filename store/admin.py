@@ -24,7 +24,7 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('-id',)
     autocomplete_fields = ('camera', 'picture')
     fieldsets = (
-        (None, {'fields': ('name', 'description', 'price', 'brand', 'color','seller')}),
+        (None, {'fields': ('name', 'description', 'price', 'brand', 'color')}),
         ('اطلاعات فنی', {
             'fields': (
                 'camera', 'picture', 'part_number', 'ram', 'sim_card',

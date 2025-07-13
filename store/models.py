@@ -66,6 +66,7 @@ class Picture (models.Model):
 class Product (models.Model):
     seller = models.ForeignKey(
         User,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='product_seller',
         verbose_name='فروشنده'
@@ -102,6 +103,7 @@ class Product (models.Model):
 
     camera = models.ForeignKey(
         Camera,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='product_cmaera',
         verbose_name='دوربین'
@@ -109,6 +111,7 @@ class Product (models.Model):
 
     picture = models.ForeignKey(
         Picture,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='product_picture',
         verbose_name='تصاویر'
@@ -249,12 +252,15 @@ class Product (models.Model):
 class Order (models.Model) :
     product = models.ForeignKey(
         Product,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='order_product',
         verbose_name='محصول'
     )
 
     buyer = models.ForeignKey(
         User,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='order_buyer',
         verbose_name='خریدار'
@@ -262,6 +268,7 @@ class Order (models.Model) :
 
     seller = models.ForeignKey(
         User,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='order_seller',
         verbose_name='فروشنده'
