@@ -8,16 +8,19 @@ from .models import Otp , User
 from utils.message import Message
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer
+from .serializers import UserSerializer , OtpInputSerializer  , UserInputSerializer
+from drf_spectacular.utils import extend_schema
 
 
 class OtpView(APIView):
     permission_classes = [AllowAny]
+    @extend_schema(request=OtpInputSerializer,)
     def post(self, request):
         mobile = request.data.get('mobile')
         if not mobile:
             return Response({'error': 'mobile is required'}, status=status.HTTP_400_BAD_REQUEST)
         otp = random.randint(100000, 999999)
+        print(otp)
         otp = Otp.objects.create(mobile=mobile, otp=otp)
         Message(otp,mobile).otpSMS()
         return Response({'message': 'OTP sent to mobile'}, status=status.HTTP_200_OK) 
@@ -25,6 +28,7 @@ class OtpView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    @extend_schema(request=OtpInputSerializer,)
     def post(self, request):
         mobile = request.data.get('mobile')
         otp = request.data.get('otp')
@@ -45,16 +49,16 @@ class LoginView(APIView):
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+    @extend_schema(request=UserInputSerializer)
     def post(self, request):
         mobile = request.data.get('mobile')
         otp = request.data.get('otp')
         if not mobile or not otp:
             return Response({'error': 'mobile and otp are required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        otp = Otp.objects.filter(mobile=mobile, otp=otp).first()
-        if not otp:
+        otp_obj= Otp.objects.filter(mobile=mobile, otp=otp).first()
+        if not otp_obj:
             return Response({'error': 'invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
-        otp.delete()
+        otp_obj.delete() 
 
         if User.objects.filter(mobile=mobile).exists():
             return Response({'error': 'user with this mobile already exists'}, status=status.HTTP_400_BAD_REQUEST)
@@ -99,13 +103,16 @@ class InformationUserView(APIView):
         
 class UserUpdateView(APIView):
     permission_classes=[IsAuthenticated]
+    @extend_schema(request=UserInputSerializer)
     def patch(self,request,id):
         user = User.objects.filter(id=id).first()
         if not user:
             return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-        is_verified =  request.data.get('is_verified')
-        is_verified = user.is_verified
-        user.save()
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response ({'success' : 'user updated'}, status=status.HTTP_200_OK)
     
         
