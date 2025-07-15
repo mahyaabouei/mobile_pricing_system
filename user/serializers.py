@@ -17,6 +17,9 @@ class OtpSerializer(serializers.ModelSerializer):
 
 class OtpInputSerializer(serializers.Serializer):
     mobile = serializers.CharField(required=True)
+
+class LoginInputSerializer(serializers.Serializer):
+    mobile = serializers.CharField(required=True)
     otp = serializers.CharField(required=True)
 
 
