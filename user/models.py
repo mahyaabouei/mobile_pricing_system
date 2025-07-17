@@ -108,6 +108,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'کاربر'
         verbose_name_plural = 'کاربران'
+        permissions = [('can_see_all_users','می تواند همه کاربران را ببیند')]
 
     def __str__(self):
         return f"{self.username}"

@@ -244,6 +244,7 @@ class Product (models.Model):
     class Meta:
         verbose_name = ("محصول")
         verbose_name_plural = ("محصولات")
+        permissions = [('can_create_products','می تواند محصولات را ایجاد کند'),('can_update_products','می تواند محصولات را بروزرسانی کند'),('can_delete_products','می تواند محصولات را حذف کند')]
 
     def __str__(self):
         return self.name
@@ -303,6 +304,7 @@ class Order (models.Model) :
     class Meta:
         verbose_name = ("سفارش")
         verbose_name_plural = ("سفارشات")
+        permissions = [('can_see_all_orders','می تواند همه سفارشات را ببیند') , ('can_update_order','می تواند سفارشات را بروزرسانی کند')]
 
     def __str__(self):
         return f"Order: {self.product.name} by {self.buyer.username} from {self.seller.username}"

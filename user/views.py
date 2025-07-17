@@ -86,23 +86,38 @@ class InformationUserView(APIView):
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if id:
-            user = User.objects.filter(id=id).first()
-            if not user:
-                return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+            if request.user.has_perm('user.can_see_all_users'):
+                user = User.objects.filter(id=id).first()
+                if not user:
+                    return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                user = request.user
+                if user.id != id:
+                    return Response({'error': 'you are not allowed to see this user'}, status=status.HTTP_403_FORBIDDEN)
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            users = User.objects.all()
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if request.user.has_perm('user.can_see_all_users'):
+                users = User.objects.all()
+                serializer = UserSerializer(users, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'you are not allowed to see all users'}, status=status.HTTP_403_FORBIDDEN)
         
+
 class UserUpdateView(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(request=UserInputSerializer)
     def patch(self,request,id):
-        user = User.objects.filter(id=id).first()
-        if not user:
-            return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+        if request.user.has_perm('user.can_see_all_users'):
+            user = User.objects.filter(id=id).first()
+            if not user:
+                return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            user = request.user
+            if user.id != id:
+                return Response({'error': 'you are not allowed to update this user'}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
