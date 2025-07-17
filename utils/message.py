@@ -1,13 +1,28 @@
-from django.conf import settings
 import requests
 import os
 
 
-class Message():
-    def __init__(self,otp,mobile):
-        self.otp = otp
-        self.mobile = mobile
-    def otpSMS(self):
-        txt = f'به ایساتیس کراد خوش آمدید \n کد تایید :{self.otp}\nisatiscrowd.ir'
-        resp = requests.get(url=f'http://tsms.ir/url/tsmshttp.php?from={os.getenv("SMS_NUMBER")}&to={self.mobile}&username={os.getenv("SMS_USERNAME")}&password={os.getenv("SMS_PASSWORD")}&message={txt}').json()
+
+
+class MessageMelipayamak():
+    def __init__(self):
+        self.username = "9011010959"
+        self.password = "@8F20"
+        self.url ="https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber"
+        self.bodyId = 130566
+    def otpSMS(self,otp,mobile):
+        data = {
+            "username":self.username,
+            "password":self.password,
+            "text":str(otp),
+            "to":str(mobile),
+            "bodyId":self.bodyId
+        }
+        print(data)
+        headers = {
+            "Content-Type":"application/json"
+        }
+        resp = requests.post(url=self.url,json=data,headers=headers).text
+        print(resp)
         return resp
+
