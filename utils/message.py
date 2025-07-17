@@ -18,11 +18,9 @@ class MessageMelipayamak():
             "to":str(mobile),
             "bodyId":self.bodyId
         }
-        print(data)
         headers = {
             "Content-Type":"application/json"
         }
         resp = requests.post(url=self.url,json=data,headers=headers).text
-        print(resp)
         return resp
 
