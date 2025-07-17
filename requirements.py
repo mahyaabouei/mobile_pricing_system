@@ -1,6 +1,0 @@
-Django==4.2.7
-djangorestframework==3.14.0
-django-cors-headers
-djangorestframework-simplejwt
-drf-spectacular
-psycopg2-binary
