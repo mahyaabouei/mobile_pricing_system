@@ -1,16 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.core.exceptions import ValidationError
 
 class User(AbstractUser):
     username = models.CharField(
         max_length=255,
         unique=True,
+
         verbose_name='کاربر')
 
     uniqidentifier = models.CharField(
         max_length=255,
-        unique=True,
+        null=True,
+        blank=True,
         verbose_name='کدملی')
 
     first_name = models.CharField(
@@ -33,8 +35,7 @@ class User(AbstractUser):
 
     mobile = models.CharField(
         max_length=255,
-        null=True,
-        blank=True,
+        unique=True,
         verbose_name='تلفن')
 
     address = models.TextField(
@@ -91,8 +92,12 @@ class User(AbstractUser):
         verbose_name='ضمانت نامه حسن انجام کار')
 
     is_active = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='فعال')
+    
+    is_register = models.BooleanField(
+        default=False,
+        verbose_name='ثبت نام شده')
 
     created_at = models.DateTimeField(
         auto_now_add=True)
@@ -106,6 +111,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username}"
+    def clean(self):
+        super().clean()
+        if self.uniqidentifier:
+            exists = User.objects.exclude(pk=self.pk).filter(uniqidentifier=self.uniqidentifier).exists()
+            if exists:
+                raise ValidationError({'uniqidentifier': 'این کد ملی قبلاً استفاده شده است.'})
 
 
 class Otp(models.Model):
