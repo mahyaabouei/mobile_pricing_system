@@ -27,7 +27,6 @@ class UserInputSerializer(serializers.Serializer):
     mobile = serializers.CharField(required=True, allow_blank=True)
     otp = serializers.CharField(required=True, allow_blank=True)
     uniqidentifier = serializers.CharField(required=True, allow_blank=True)
-    username = serializers.CharField(required=True, allow_blank=True)
     first_name = serializers.CharField(required=True, allow_blank=True)
     last_name = serializers.CharField(required=True, allow_blank=True)
     email = serializers.EmailField(required=True, allow_blank=True)
