@@ -8,7 +8,7 @@ from .models import Otp , User
 from utils.message import Message
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer , OtpInputSerializer  , UserInputSerializer
+from .serializers import UserSerializer , OtpInputSerializer  , UserInputSerializer , LoginInputSerializer
 from drf_spectacular.utils import extend_schema
 
 
@@ -18,29 +18,33 @@ class OtpView(APIView):
     def post(self, request):
         mobile = request.data.get('mobile')
         if not mobile:
-            return Response({'error': 'mobile is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'شماره موبایل را وارد کنید'}, status=status.HTTP_400_BAD_REQUEST)
         otp = random.randint(100000, 999999)
         print(otp)
         otp = Otp.objects.create(mobile=mobile, otp=otp)
         Message(otp,mobile).otpSMS()
-        return Response({'message': 'OTP sent to mobile'}, status=status.HTTP_200_OK) 
+        return Response({'message': 'کد تایید به شماره موبایل شما ارسال شد'}, status=status.HTTP_200_OK) 
 
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
-    @extend_schema(request=OtpInputSerializer,)
+    @extend_schema(request=LoginInputSerializer,)
     def post(self, request):
         mobile = request.data.get('mobile')
         otp = request.data.get('otp')
         if not mobile or not otp:
-            return Response({'error': 'mobile and otp are required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'شماره موبایل و کد تایید را وارد کنید'}, status=status.HTTP_400_BAD_REQUEST)
         otp = Otp.objects.filter(mobile=mobile, otp=otp).first()
         if not otp:
-            return Response({'error': 'invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'کد تایید اشتباه است'}, status=status.HTTP_400_BAD_REQUEST)
         otp.delete()
         user = User.objects.filter(mobile=mobile).first()
+
         if not user:
-            return Response({'error': 'user not registered'}, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.create(
+                mobile=mobile,
+                username=mobile,
+            )
         refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
 
@@ -48,23 +52,14 @@ class LoginView(APIView):
     
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     @extend_schema(request=UserInputSerializer)
     def post(self, request):
-        mobile = request.data.get('mobile')
-        otp = request.data.get('otp')
-        if not mobile or not otp:
-            return Response({'error': 'mobile and otp are required'}, status=status.HTTP_400_BAD_REQUEST)
-        otp_obj= Otp.objects.filter(mobile=mobile, otp=otp).first()
-        if not otp_obj:
-            return Response({'error': 'invalid otp'}, status=status.HTTP_400_BAD_REQUEST)
-        otp_obj.delete() 
-
-        if User.objects.filter(mobile=mobile).exists():
-            return Response({'error': 'user with this mobile already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = User.objects.create(
-            mobile=mobile,
+        user = request.user
+        if user.is_register:
+            return Response({'message': 'قبلا ثبت نام کردید'}, status=status.HTTP_400_BAD_REQUEST)
+        User.objects.filter(id=user.id).update(
+            mobile=request.data.get('mobile'),
             username = request.data.get('uniqidentifier'),
             uniqidentifier = request.data.get('uniqidentifier'),
             first_name = request.data.get('first_name'),
@@ -77,19 +72,19 @@ class RegisterView(APIView):
             account_bank = request.data.get('account_bank'),
             address = request.data.get('address'),
             city = request.data.get('city'),
-            is_active = True,
+            is_register = True,
         )
-        serializer = UserSerializer(user)
-        refresh = RefreshToken.for_user(user)
-        access = str(refresh.access_token)
 
-        return Response({'access': access,'refresh': str(refresh)}, status=status.HTTP_200_OK)
+        return Response({'message': 'اطلاعات شما ثبت شد'}, status=status.HTTP_200_OK)
     
 
 class InformationUserView(APIView):
     permission_classes = [IsAuthenticated]
     def get (self, request,id=None):
         user = request.user
+        if not user.admin:
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         if id:
             user = User.objects.filter(id=id).first()
             if not user:
@@ -115,4 +110,11 @@ class UserUpdateView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response ({'success' : 'user updated'}, status=status.HTTP_200_OK)
     
-        
+
+class RefreshView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        refresh = RefreshToken(request.data.get('refresh'))
+        access = str(refresh.access_token)
+        return Response({'access': access}, status=status.HTTP_200_OK)
+
