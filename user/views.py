@@ -5,12 +5,11 @@ from rest_framework.response import Response
 from rest_framework import status
 import random
 from .models import Otp , User
-from utils.message import Message
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer , OtpInputSerializer  , UserInputSerializer , LoginInputSerializer
 from drf_spectacular.utils import extend_schema
-
+from utils.message import MessageMelipayamak
 
 class OtpView(APIView):
     permission_classes = [AllowAny]
@@ -20,9 +19,8 @@ class OtpView(APIView):
         if not mobile:
             return Response({'message': 'شماره موبایل را وارد کنید'}, status=status.HTTP_400_BAD_REQUEST)
         otp = random.randint(100000, 999999)
-        print(otp)
+        MessageMelipayamak().otpSMS(otp,mobile)
         otp = Otp.objects.create(mobile=mobile, otp=otp)
-        Message(otp,mobile).otpSMS()
         return Response({'message': 'کد تایید به شماره موبایل شما ارسال شد'}, status=status.HTTP_200_OK) 
 
 
@@ -76,33 +74,34 @@ class RegisterView(APIView):
         )
 
         return Response({'message': 'اطلاعات شما ثبت شد'}, status=status.HTTP_200_OK)
-    
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class InformationUserView(APIView):
     permission_classes = [IsAuthenticated]
     def get (self, request,id=None):
         user = request.user
         if not user.admin:
-            serializer = UserSerializer(user)
+            return Response({'error': 'دسترسی غیرمجاز'}, status=status.HTTP_403_FORBIDDEN)
+        print(user.user_permissions.all())
+        if id == None:
+            if not user.has_perm('user.can_see_all_users'):
+                return Response({'error': 'دسترسی غیرمجاز'}, status=status.HTTP_403_FORBIDDEN)
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if id:
-            if request.user.has_perm('user.can_see_all_users'):
-                user = User.objects.filter(id=id).first()
-                if not user:
-                    return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                user = request.user
-                if user.id != id:
-                    return Response({'error': 'you are not allowed to see this user'}, status=status.HTTP_403_FORBIDDEN)
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            if request.user.has_perm('user.can_see_all_users'):
-                users = User.objects.all()
-                serializer = UserSerializer(users, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'you are not allowed to see all users'}, status=status.HTTP_403_FORBIDDEN)
+        user = User.objects.filter(id=id).first()
+        if not user:
+            return Response({'error': 'کاربر یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
         
 
 class UserUpdateView(APIView):
