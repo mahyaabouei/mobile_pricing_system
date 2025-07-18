@@ -89,7 +89,6 @@ class InformationUserView(APIView):
         user = request.user
         if not user.admin:
             return Response({'error': 'دسترسی غیرمجاز'}, status=status.HTTP_403_FORBIDDEN)
-        print(user.user_permissions.all())
         if id == None:
             if not user.has_perm('user.can_see_all_users'):
                 return Response({'error': 'دسترسی غیرمجاز'}, status=status.HTTP_403_FORBIDDEN)
@@ -108,21 +107,17 @@ class UserUpdateView(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(request=UserInputSerializer)
     def patch(self,request,id):
-        if request.user.has_perm('user.can_see_all_users'):
-            user = User.objects.filter(id=id).first()
-            if not user:
-                return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            user = request.user
-            if user.id != id:
-                return Response({'error': 'you are not allowed to update this user'}, status=status.HTTP_403_FORBIDDEN)
-
+        if not request.user.has_perm('user.can_see_all_users'):
+            return Response({'message': 'دسترسی غیرمجاز'}, status=status.HTTP_403_FORBIDDEN)
+        user = User.objects.filter(id=id).first()
+        if not user:
+            return Response({'message': 'کاربر یافت نشد'}, status=status.HTTP_404_NOT_FOUND)
+        request.data['password'] = 'defualt'
         serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response ({'success' : 'user updated'}, status=status.HTTP_200_OK)
+        serializer.save()
+        return Response ({'message' : 'اطلاعات کاربر با موفقیت به روز شد'}, status=status.HTTP_200_OK)
     
 
 class RefreshView(APIView):
