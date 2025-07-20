@@ -22,12 +22,11 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('type_product', 'status_product', 'brand', 'registered', 'guarantor', 'repaired', 'hit_product')
     list_editable = ('status_product', 'registered')
     ordering = ('-id',)
-    autocomplete_fields = ('camera', 'picture')
     fieldsets = (
         (None, {'fields': ('name', 'description', 'price', 'brand', 'color')}),
         ('اطلاعات فنی', {
             'fields': (
-                'camera', 'picture', 'part_number', 'ram', 'sim_card',
+                'part_number', 'ram', 'sim_card',
                 'battry', 'battry_health', 'battry_change',
                 'size', 'charger', 'carton'
             )
@@ -40,6 +39,12 @@ class ProductAdmin(admin.ModelAdmin):
                 'type_product', 'technical_problem', 'hit_product',
                 'register_date', 'registered', 'guarantor', 'repaired', 'status_product'
             )
+        }),
+        ('تصاویر', {
+            'fields': ('picture',)
+        }),
+        ('دوربین', {
+            'fields': ('camera',)
         }),
     )
 

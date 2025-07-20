@@ -1,6 +1,6 @@
 from .models import Camera , Picture , Product , Order
 from .serializers import CameraSerializer , PictureSerializer , ProductSerializer , OrderSerializer
-from django.http import HttpResponse
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 import datetime
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import CameraInputSerializer , PictureInputSerializer , ProductInputSerializer , OrderInputSerializer
+from .serializers import CameraInputSerializer , PictureInputSerializer , ProductInputSerializer , OrderInputSerializer , ProductDetailSerializer
 
 class CameraViewSet(APIView):
 
@@ -39,12 +39,7 @@ class CameraViewSet(APIView):
 
 
 class PictureViewSet(APIView):
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-    
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     @extend_schema(request=PictureInputSerializer)
     def post (self,request):
@@ -66,17 +61,12 @@ class PictureViewSet(APIView):
         
 
 class ProductViewSet(APIView):
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-    
+    permission_classes = [IsAuthenticated]
     @extend_schema(request=ProductInputSerializer)
     def post (self,request):
-        if not request.user.has_perm('store.can_create_products'):
-            return Response({"error":"You are not allowed to create products"},status=status.HTTP_403_FORBIDDEN)
         request.data['seller'] = request.user.id
+        print(request.data)
+        request.data['register_date'] = datetime.datetime.strptime(request.data['register_date'], '%Y-%m-%d') if request.data['register_date'] else None
         serializer = ProductSerializer(data=request.data) 
         if serializer.is_valid():
             serializer.save()
@@ -86,7 +76,7 @@ class ProductViewSet(APIView):
     def get (self, request,id=None):
         if id :
             product = Product.objects.get(id=id)
-            serializer = ProductSerializer(product)
+            serializer = ProductDetailSerializer(product)
             return Response(serializer.data)
         else:
             products = Product.objects.all()
@@ -121,9 +111,11 @@ class OrderViewSet(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(request=OrderInputSerializer)
     def post (self,request):
-        product = Product.objects.filter(id=request.data['product']).first()
+        product = Product.objects.filter(id=request.data['product'],status_product__in =['open','ordering']).first()
         if not product :
-            return Response({"error":"Product not found"},status=status.HTTP_404_NOT_FOUND)
+            return Response({"message":"محصول یافت نشد"},status=status.HTTP_404_NOT_FOUND)
+        if product.seller == request.user :
+            return Response({"message":"شما نمیتوانید خود را سفارش دهید"},status=status.HTTP_403_FORBIDDEN)
         seller = product.seller
         buyer = request.user
         order = Order.objects.create(
@@ -131,28 +123,33 @@ class OrderViewSet(APIView):
             buyer = buyer,
             product = product ,
             status = 'ordering',
-            sell_date = datetime.now()
+            sell_date = datetime.datetime.now()
         )
         serializer = OrderSerializer(order)
-        return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
     
     def get (self, request,id=None):
         if id :
-            order = Order.objects.get(id=id)
+            order = Order.objects.filter(Q(id=id) & (Q(buyer=request.user) | Q(seller=request.user))).first()
+            if not order :
+                return Response({"message":"سفارشی یافت نشد"},status=status.HTTP_404_NOT_FOUND)
+
             serializer = OrderSerializer(order)
             return Response(serializer.data)
         else:
-            orders = Order.objects.all()
+            orders = Order.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
             serializer = OrderSerializer(orders,many=True)
             return Response(serializer.data)
         
 
     def patch (self,request,id):
-        if not request.user.has_perm('store.can_update_order'):
-            return Response({"error":"You are not allowed to update order"},status=status.HTTP_403_FORBIDDEN)
+        if not id:
+            return Response({"message":"شناسه سفارش را وارد کنید"},status=status.HTTP_400_BAD_REQUEST)
         order = Order.objects.filter(id=id).first()
         if not order :
-            return Response({"error":"Order not found"},status=status.HTTP_404_NOT_FOUND)
+            return Response({"message":"سفارش یافت نشد"},status=status.HTTP_404_NOT_FOUND)
+        if order.seller != request.user :
+            return Response({"message":"شما نمیتوانید این سفارش را بروزرسانی کنید"},status=status.HTTP_403_FORBIDDEN)
         serializer = OrderSerializer(order,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()

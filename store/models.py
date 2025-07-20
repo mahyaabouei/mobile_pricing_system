@@ -101,18 +101,16 @@ class Product (models.Model):
         blank= True,
         verbose_name='رنگ')
 
-    camera = models.ForeignKey(
+    camera = models.ManyToManyField(
         Camera,
         null=True,
-        on_delete=models.SET_NULL,
         related_name='product_cmaera',
         verbose_name='دوربین'
     )
 
-    picture = models.ForeignKey(
+    picture = models.ManyToManyField(
         Picture,
         null=True,
-        on_delete=models.SET_NULL,
         related_name='product_picture',
         verbose_name='تصاویر'
     )
@@ -230,6 +228,7 @@ class Product (models.Model):
     status_product = models.CharField(
         max_length=25,
         choices=STATUS_PRODUCT,
+        default='open',
         null= True,
         blank= True,
         verbose_name='وضعیت فروش محصول')

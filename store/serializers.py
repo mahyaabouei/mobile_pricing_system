@@ -14,12 +14,23 @@ class PictureSerializer(serializers.ModelSerializer):
         fields = '__all__'
  
 class ProductSerializer(serializers.ModelSerializer):
-    picture = PictureSerializer()
-    camera = CameraSerializer()
+    camera = serializers.PrimaryKeyRelatedField(queryset=Camera.objects.all(), many=True)
+    picture = serializers.PrimaryKeyRelatedField(queryset=Picture.objects.all(), many=True)
+
     class Meta:
         model = Product
         fields = ['camera' , 'picture' , 'name' ,'seller','price' , 'description' , 'id' , 'created_at' , 'updated_at' , 'brand' , 'color' , 'type_product' 
                   , 'technical_problem' , 'hit_product' , 'registered' ,'register_date', 'guarantor' , 'repaired' , 'status_product' ]
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    camera = CameraSerializer(many=True)
+    picture = PictureSerializer(many=True)
+    
+    class Meta:
+        model = Product
+        fields = ['camera' , 'picture' , 'name' ,'seller','price' , 'description' , 'id' , 'created_at' , 'updated_at' , 'brand' , 'color' , 'type_product' 
+                  , 'technical_problem' , 'hit_product' , 'registered' ,'register_date', 'guarantor' , 'repaired' , 'status_product' ]
+
 
 class OrderSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
