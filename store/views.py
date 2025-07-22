@@ -9,6 +9,7 @@ import datetime
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import CameraInputSerializer , PictureInputSerializer , ProductInputSerializer , OrderInputSerializer , ProductDetailSerializer
+from django.db.models import Sum
 
 class CameraViewSet(APIView):
 
@@ -156,3 +157,13 @@ class OrderViewSet(APIView):
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
+
+class StatisticViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    def get (self,request):
+        orders_seller = Order.objects.filter(seller=request.user).count()
+        orders_buyer = Order.objects.filter(buyer=request.user).count()
+        products = Product.objects.filter(seller=request.user).count()
+        total_price_seller = Order.objects.filter(seller=request.user,status='approved').aggregate(total_price=Sum('product__price'))['total_price'] or 0
+        total_price_buyer = Order.objects.filter(buyer=request.user,status='approved').aggregate(total_price=Sum('product__price'))['total_price'] or 0
+        return Response({"orders_seller":orders_seller,"orders_buyer":orders_buyer,"products":products,"total_price_seller":total_price_seller,"total_price_buyer":total_price_buyer})

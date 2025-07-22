@@ -83,8 +83,7 @@ class Product (models.Model):
         blank= True,
         verbose_name='توضیحات')
 
-    price = models.CharField(
-        max_length=256,
+    price = models.IntegerField(
         null= True,
         blank= True,
         verbose_name='قیمت')

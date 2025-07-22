@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CameraViewSet,PictureViewSet,ProductViewSet,OrderViewSet
+from .views import CameraViewSet,PictureViewSet,ProductViewSet,OrderViewSet,StatisticViewSet
 
 urlpatterns = [
         path('camera/',CameraViewSet.as_view(),name='camera'),
@@ -10,4 +10,5 @@ urlpatterns = [
         path('product/<int:id>/' , ProductViewSet.as_view(), name='product'),
         path('order/' , OrderViewSet.as_view(), name='order'),
         path('order/<int:id>/' , OrderViewSet.as_view(), name='order'),
+        path('statistic/' , StatisticViewSet.as_view(), name='statistic'),
     ]
