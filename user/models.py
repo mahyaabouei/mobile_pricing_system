@@ -92,7 +92,7 @@ class User(AbstractUser):
         verbose_name='ضمانت نامه حسن انجام کار')
 
     is_active = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name='فعال')
 
     is_register = models.BooleanField(

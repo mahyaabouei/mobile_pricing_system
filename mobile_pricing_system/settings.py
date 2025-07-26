@@ -23,7 +23,6 @@ ALLOWED_HOSTS = ['*']
 
 
 
-
 AUTH_USER_MODEL = 'user.User'
 
 
@@ -93,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mobile',
         'USER': 'postgres',
-        'PASSWORD': 'Moeen....6168',
+        'PASSWORD': 'Moeen00006168',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -130,6 +129,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -139,9 +139,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # برای پنل ادمین و مرورگرها
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # برای API
     ),
 }
+
 
 
 from datetime import timedelta
