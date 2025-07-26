@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'mobile',
         'USER': 'postgres',
         'PASSWORD': 'Moeen00006168',
-        'HOST': 'localhost',
+        'HOST': '193.56.135.20',
         'PORT': '5432',
     }
 }
