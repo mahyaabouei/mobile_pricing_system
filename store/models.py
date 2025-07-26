@@ -19,7 +19,7 @@ class Camera (models.Model):
         null= True,
         blank= True,
         verbose_name='توضیحات')
-    
+
     created_at = models.DateTimeField(
         auto_now_add=True)
 
@@ -83,7 +83,7 @@ class Product (models.Model):
         blank= True,
         verbose_name='توضیحات')
 
-    price = models.IntegerField(
+    price = models.BigIntegerField(
         null= True,
         blank= True,
         verbose_name='قیمت')
@@ -103,6 +103,7 @@ class Product (models.Model):
     camera = models.ManyToManyField(
         Camera,
         null=True,
+        blank=True,
         related_name='product_cmaera',
         verbose_name='دوربین'
     )
@@ -110,6 +111,7 @@ class Product (models.Model):
     picture = models.ManyToManyField(
         Picture,
         null=True,
+        blank=True,
         related_name='product_picture',
         verbose_name='تصاویر'
     )
@@ -291,7 +293,7 @@ class Order (models.Model) :
         null= True,
         blank= True,
         verbose_name='وضعیت سفارش')
-    
+
     created_at = models.DateTimeField(
         auto_now_add=True)
 
