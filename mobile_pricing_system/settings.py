@@ -154,3 +154,11 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API mobile pricing system',
+    'DESCRIPTION': 'API mobile pricing system',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
