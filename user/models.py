@@ -35,7 +35,7 @@ class User(AbstractUser):
 
     mobile = models.CharField(
         max_length=255,
-        unique=True,
+        # unique=True,
         verbose_name='تلفن')
 
     address = models.TextField(
@@ -94,7 +94,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(
         default=False,
         verbose_name='فعال')
-    
+
     is_register = models.BooleanField(
         default=False,
         verbose_name='ثبت نام شده')
