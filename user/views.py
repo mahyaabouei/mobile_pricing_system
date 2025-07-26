@@ -21,7 +21,7 @@ class OtpView(APIView):
         otp = random.randint(100000, 999999)
         MessageMelipayamak().otpSMS(otp,mobile)
         otp = Otp.objects.create(mobile=mobile, otp=otp)
-        return Response({'message': 'کد تایید به شماره موبایل شما ارسال شد'}, status=status.HTTP_200_OK) 
+        return Response({'message': 'کد تایید به شماره موبایل شما ارسال شد'}, status=status.HTTP_200_OK)
 
 
 class LoginView(APIView):
@@ -47,7 +47,7 @@ class LoginView(APIView):
         access = str(refresh.access_token)
 
         return Response({'access': access,'refresh': str(refresh)}, status=status.HTTP_200_OK)
-    
+
 
 class RegisterView(APIView):
     permission_classes = [IsAuthenticated]
@@ -57,7 +57,7 @@ class RegisterView(APIView):
         if user.is_register:
             return Response({'message': 'قبلا ثبت نام کردید'}, status=status.HTTP_400_BAD_REQUEST)
         User.objects.filter(id=user.id).update(
-            mobile=request.data.get('mobile'),
+            mobile=user.mobile,
             username = request.data.get('uniqidentifier'),
             uniqidentifier = request.data.get('uniqidentifier'),
             first_name = request.data.get('first_name'),
@@ -101,7 +101,7 @@ class InformationUserView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-        
+
 
 class UserUpdateView(APIView):
     permission_classes=[IsAuthenticated]
@@ -118,7 +118,7 @@ class UserUpdateView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response ({'message' : 'اطلاعات کاربر با موفقیت به روز شد'}, status=status.HTTP_200_OK)
-    
+
 
 class RefreshView(APIView):
     permission_classes = [IsAuthenticated]

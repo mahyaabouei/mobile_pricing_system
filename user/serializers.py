@@ -33,7 +33,6 @@ class LoginInputSerializer(serializers.Serializer):
 
 
 class UserInputSerializer(serializers.Serializer):
-    mobile = serializers.CharField(required=True, allow_blank=True)
     otp = serializers.CharField(required=True, allow_blank=True)
     uniqidentifier = serializers.CharField(required=True, allow_blank=True)
     first_name = serializers.CharField(required=True, allow_blank=True)
