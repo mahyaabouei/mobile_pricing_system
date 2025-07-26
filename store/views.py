@@ -17,7 +17,7 @@ class CameraViewSet(APIView):
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
-    
+
     @extend_schema(request=CameraInputSerializer)
     def post (self,request):
         serializer = CameraSerializer(data=request.data)
@@ -26,7 +26,7 @@ class CameraViewSet(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-    
+
     def get (self, request,id=None):
         if id :
             camera = Camera.objects.get(id=id)
@@ -49,7 +49,7 @@ class PictureViewSet(APIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get (self, request,id=None):
         if id :
             picture = Picture.objects.get(id=id)
@@ -59,7 +59,7 @@ class PictureViewSet(APIView):
             pictures = Picture.objects.all()
             serializer = PictureSerializer(pictures,many=True)
             return Response(serializer.data)
-        
+
 
 class ProductViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -68,12 +68,13 @@ class ProductViewSet(APIView):
         request.data['seller'] = request.user.id
         print(request.data)
         request.data['register_date'] = datetime.datetime.strptime(request.data['register_date'], '%Y-%m-%d') if request.data['register_date'] else None
-        serializer = ProductSerializer(data=request.data) 
+        request.data['status_product'] = 'open' if request.data['status_product'] is None else request.data['status_product']
+        serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get (self, request,id=None):
         if id :
             product = Product.objects.get(id=id)
@@ -83,7 +84,7 @@ class ProductViewSet(APIView):
             products = Product.objects.all()
             serializer = ProductSerializer(products,many=True)
             return Response(serializer.data)
-        
+
 
     def patch (self,request,id):
         if not request.user.has_perm('store.can_update_products'):
@@ -96,7 +97,7 @@ class ProductViewSet(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
 
     def delete (self,request,id):
         if not request.user.has_perm('store.can_delete_products'):
@@ -112,11 +113,12 @@ class OrderViewSet(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(request=OrderInputSerializer)
     def post (self,request):
-        product = Product.objects.filter(id=request.data['product'],status_product__in =['open','ordering']).first()
+        product_id = request.data.get('product')
+        product = Product.objects.filter(id=int(product_id),status_product__in =['open','ordering']).first()
         if not product :
             return Response({"message":"محصول یافت نشد"},status=status.HTTP_404_NOT_FOUND)
         if product.seller == request.user :
-            return Response({"message":"شما نمیتوانید خود را سفارش دهید"},status=status.HTTP_403_FORBIDDEN)
+            return Response({"message":"شما نمیتوانید خود را سفارش دهید"},status=status.HTTP_400_BAD_REQUEST)
         seller = product.seller
         buyer = request.user
         order = Order.objects.create(
@@ -128,7 +130,7 @@ class OrderViewSet(APIView):
         )
         serializer = OrderSerializer(order)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
-    
+
     def get (self, request,id=None):
         if id :
             order = Order.objects.filter(Q(id=id) & (Q(buyer=request.user) | Q(seller=request.user))).first()
@@ -141,7 +143,7 @@ class OrderViewSet(APIView):
             orders = Order.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
             serializer = OrderSerializer(orders,many=True)
             return Response(serializer.data)
-        
+
 
     def patch (self,request,id):
         if not id:
@@ -156,7 +158,7 @@ class OrderViewSet(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class StatisticViewSet(APIView):
     permission_classes = [IsAuthenticated]
