@@ -35,7 +35,8 @@ class User(AbstractUser):
 
     mobile = models.CharField(
         max_length=255,
-        # unique=True,
+        null=True,
+        blank=True,
         verbose_name='تلفن')
 
     address = models.TextField(

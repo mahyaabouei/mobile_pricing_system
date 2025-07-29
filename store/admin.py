@@ -1,13 +1,5 @@
 from django.contrib import admin
-from .models import Camera, Picture, Product, Order
-
-
-@admin.register(Camera)
-class CameraAdmin(admin.ModelAdmin):
-    list_display = ('name', 'resolution')
-    search_fields = ('name', 'resolution')
-    list_filter = ('resolution',)
-
+from .models import Picture, Product, Order
 
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
@@ -17,18 +9,18 @@ class PictureAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'seller','brand', 'price', 'color', 'type_product', 'status_product', 'registered', 'guarantor')
-    search_fields = ('name', 'brand', 'part_number')
-    list_filter = ('type_product', 'status_product', 'brand', 'registered', 'guarantor', 'repaired', 'hit_product')
-    list_editable = ('status_product', 'registered')
+    list_display = ( 'seller', 'price', 'color', 'type_product', 'status_product', 'guarantor')
+    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired', 'hit_product')
+    list_editable = ('status_product',)
     ordering = ('-id',)
+    search_fields = ('description', 'color', 'ram', 'guarantor')
     fieldsets = (
-        (None, {'fields': ('name', 'description', 'price', 'brand', 'color')}),
+        (None, {'fields': ( 'description', 'price', 'color')}),
         ('اطلاعات فنی', {
             'fields': (
-                'part_number', 'ram', 'sim_card',
-                'battry', 'battry_health', 'battry_change',
-                'size', 'charger', 'carton'
+                'ram', 'sim_card',
+                'battry_health', 'battry_change',
+                'size'
             )
         }),
         ('فروشنده', {
@@ -37,15 +29,13 @@ class ProductAdmin(admin.ModelAdmin):
         ('وضعیت محصول', {
             'fields': (
                 'type_product', 'technical_problem', 'hit_product',
-                'register_date', 'registered', 'guarantor', 'repaired', 'status_product'
+                'guarantor', 'repaired', 'status_product'
             )
         }),
         ('تصاویر', {
             'fields': ('picture',)
         }),
-        ('دوربین', {
-            'fields': ('camera',)
-        }),
+
     )
 
 

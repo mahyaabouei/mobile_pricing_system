@@ -1,5 +1,5 @@
-from .models import Camera , Picture , Product , Order
-from .serializers import CameraSerializer , PictureSerializer , ProductSerializer , OrderSerializer
+from .models import Picture , Product , Order , ModelMobile
+from .serializers import PictureSerializer , ProductSerializer , OrderSerializer , MobileSerializer
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,36 +8,8 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 import datetime
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import CameraInputSerializer , PictureInputSerializer , ProductInputSerializer , OrderInputSerializer , ProductDetailSerializer
+from .serializers import PictureInputSerializer , ProductInputSerializer , OrderInputSerializer , ProductDetailSerializer
 from django.db.models import Sum
-
-class CameraViewSet(APIView):
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-
-    @extend_schema(request=CameraInputSerializer)
-    def post (self,request):
-        serializer = CameraSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-    def get (self, request,id=None):
-        if id :
-            camera = Camera.objects.get(id=id)
-            serializer = CameraSerializer(camera)
-            return Response(serializer.data)
-        else:
-            cameras = Camera.objects.all()
-            serializer = CameraSerializer(cameras,many=True)
-            return Response(serializer.data)
-
-
 
 class PictureViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -169,3 +141,24 @@ class StatisticViewSet(APIView):
         total_price_seller = Order.objects.filter(seller=request.user,status='approved').aggregate(total_price=Sum('product__price'))['total_price'] or 0
         total_price_buyer = Order.objects.filter(buyer=request.user,status='approved').aggregate(total_price=Sum('product__price'))['total_price'] or 0
         return Response({"orders_seller":orders_seller,"orders_buyer":orders_buyer,"products":products,"total_price_seller":total_price_seller,"total_price_buyer":total_price_buyer})
+
+
+# class MobileViewSet(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def get (self,request):
+#         mobiles = Mobile.objects.all()
+#         serializer = MobileSerializer(mobiles,many=True)
+#         return Response(serializer.data , status=status.HTTP_200_OK)
+
+#     def post (self,request):
+#         data = request.data
+#         if request.data.get('is_apple'):
+#             data['brand'] = 'apple'
+#         else:
+#             data['brand'] = request.data.get('brand')
+
+#         serializer = MobileSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data , status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)

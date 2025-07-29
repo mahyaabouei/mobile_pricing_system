@@ -1,40 +1,6 @@
 from django.db import models
 from user.models import User
 
-
-class Camera (models.Model):
-    name = models.CharField(
-        max_length=255,
-        null= True,
-        blank= True,
-        verbose_name='نام')
-
-    resolution = models.CharField(
-        max_length=255,
-        null= True,
-        blank= True,
-        verbose_name='رزولوشن')
-
-    description = models.TextField(
-        null= True,
-        blank= True,
-        verbose_name='توضیحات')
-
-    created_at = models.DateTimeField(
-        auto_now_add=True)
-
-    updated_at = models.DateTimeField(
-        auto_now=True)
-
-
-    class Meta:
-        verbose_name = ("دوربین")
-        verbose_name_plural = ("دوربین ها")
-
-    def __str__(self):
-        return self.name
-
-
 class Picture (models.Model):
     file = models.FileField(
         upload_to=('product/picture/'),
@@ -63,6 +29,72 @@ class Picture (models.Model):
         return self.name
 
 
+
+
+class ModelMobile (models.Model):
+    model_name = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='نام مدل'
+    )
+
+    brand = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='برند'
+    )
+
+    color = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='رنگ'
+    )
+    picture = models.ManyToManyField(
+        Picture,
+        blank=True,
+        related_name='mobile_picture',
+        verbose_name='تصاویر'
+    )
+
+    is_apple = models.BooleanField(
+        default=False,
+        verbose_name='اپل'
+    )
+
+    part_number =models.CharField(
+        max_length=256,
+        null= True,
+        blank= True,
+        verbose_name='پارت نامبر')
+
+    registered = models.BooleanField (
+        default= False,
+        verbose_name='رجیستر شده'
+    )
+
+    link = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name='لینک'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
+    class Meta:
+        verbose_name = ("موبایل")
+        verbose_name_plural = ("موبایل ها")
+
+    def __str__(self):
+        return self.name
+
+
 class Product (models.Model):
     seller = models.ForeignKey(
         User,
@@ -71,12 +103,6 @@ class Product (models.Model):
         related_name='product_seller',
         verbose_name='فروشنده'
     )
-
-    name = models.CharField(
-        max_length=255,
-        null= True,
-        blank= True,
-        verbose_name='نام محصول')
 
     description = models.TextField(
         null= True,
@@ -88,57 +114,30 @@ class Product (models.Model):
         blank= True,
         verbose_name='قیمت')
 
-    brand  =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='برند')
-
     color =models.CharField(
         max_length=256,
         null= True,
         blank= True,
         verbose_name='رنگ')
 
-    camera = models.ManyToManyField(
-        Camera,
-        null=True,
-        blank=True,
-        related_name='product_cmaera',
-        verbose_name='دوربین'
-    )
-
     picture = models.ManyToManyField(
         Picture,
-        null=True,
         blank=True,
         related_name='product_picture',
         verbose_name='تصاویر'
     )
 
-    part_number =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='پارت نامبر')
-
     ram =models.CharField(
         max_length=256,
         null= True,
         blank= True,
-        verbose_name='حافظه')
+        verbose_name='حافظه داخلی')
 
     sim_card =models.CharField(
         max_length=256,
         null= True,
         blank= True,
         verbose_name='تعداد سیم کارت')
-
-    battry =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='باتری')
 
     battry_health =models.CharField(
         max_length=256,
@@ -149,22 +148,6 @@ class Product (models.Model):
     battry_change =models.BooleanField (
         default= False,
         verbose_name='باتری تعویض شده'
-    )
-
-    size =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='سایز')
-
-    charger =models.BooleanField (
-        default= False,
-        verbose_name='شارژر'
-    )
-
-    carton =models.BooleanField (
-        default= False,
-        verbose_name='کارتن'
     )
 
     TYPE_PRODUCT = [
@@ -180,9 +163,8 @@ class Product (models.Model):
         blank= True,
         verbose_name='وضعیت محصول')
 
-    technical_problem = models.TextField(
-        null= True,
-        blank= True,
+    technical_problem = models.BooleanField (
+        default= False,
         verbose_name='مشکل فنی')
 
     hit_product = models.BooleanField (
@@ -190,29 +172,11 @@ class Product (models.Model):
         verbose_name='ضرب خوردگی'
     )
 
-    register_date = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name='تاریخ رجیستری'
-    )
-
-    registered = models.BooleanField (
-        default= False,
-        verbose_name='رجیستر شده'
-    )
-
-    GUARANTOR = [
-        ('guarantor','گارانتی'),
-        ('guarantor_registered','رجیستر شده و گارانتی'),
-        ('disregistered','بدون رجیستری')
-    ]
     guarantor = models.CharField(
-        max_length=25,
-        choices=GUARANTOR,
+        max_length=256,
         null= True,
         blank= True,
-        verbose_name='گارانتی و رجیستری ')
-
+        verbose_name='گارانتی')
 
     repaired = models.BooleanField (
         default= False,
@@ -233,6 +197,27 @@ class Product (models.Model):
         null= True,
         blank= True,
         verbose_name='وضعیت فروش محصول')
+
+    CARTON = [
+        ('orginal','اورجینال'),
+        ('repakage','رپیکیج'),
+    ]
+
+    carton = models.CharField(
+        max_length=256,
+        choices=CARTON,
+        null= True,
+        blank= True,
+        verbose_name='کارتن'
+    )
+
+    model_mobile = models.ForeignKey(
+        ModelMobile,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='product_model_mobile',
+        verbose_name='مدل موبایل'
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True)
