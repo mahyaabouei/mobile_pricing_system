@@ -56,8 +56,8 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(ModelMobile)
 class MobileAdmin(admin.ModelAdmin):
-    list_display = ('model_name', 'brand', 'get_colors', 'is_apple', 'registered', 'link')
-    list_filter = ('is_apple', 'registered')
+    list_display = ('model_name', 'brand', 'get_colors', 'is_apple', 'link')
+    list_filter = ('is_apple',)
     ordering = ('-id',)
     search_fields = ('model_name', 'brand', 'link')
     fieldsets = (

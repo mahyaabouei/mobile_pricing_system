@@ -85,17 +85,6 @@ class ModelMobile (models.Model):
         verbose_name='اپل'
     )
 
-    part_number =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='پارت نامبر')
-
-    registered = models.BooleanField (
-        default= False,
-        verbose_name='رجیستر شده'
-    )
-
     link = models.URLField(
         null=True,
         blank=True,
