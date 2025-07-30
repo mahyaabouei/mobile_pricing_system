@@ -16,7 +16,7 @@ class PictureAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ( 'seller', 'price', 'color', 'type_product', 'status_product', 'guarantor')
-    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired', 'hit_product')
+    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired')
     list_editable = ('status_product',)
     ordering = ('-id',)
     search_fields = ('description', 'color', 'ram', 'guarantor')
@@ -34,7 +34,7 @@ class ProductAdmin(admin.ModelAdmin):
         }),
         ('وضعیت محصول', {
             'fields': (
-                'type_product', 'technical_problem', 'hit_product',
+                'type_product', 'technical_problem',
                 'guarantor', 'repaired', 'status_product'
             )
         }),

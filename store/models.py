@@ -133,7 +133,7 @@ class Product (models.Model):
         blank= True,
         verbose_name='قیمت')
 
-    color =models.ForeignKey(Color,verbose_name='رنگ')
+    color =models.ForeignKey(Color,on_delete=models.SET_NULL , null=True, verbose_name='رنگ')
 
     picture = models.ManyToManyField(
         Picture,
