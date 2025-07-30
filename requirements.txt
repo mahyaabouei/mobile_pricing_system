@@ -9,3 +9,4 @@ zeep
 requests
 aiohttp
 asyncio
+django-colorfield

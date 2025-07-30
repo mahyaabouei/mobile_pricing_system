@@ -1,6 +1,26 @@
 from django.db import models
 from user.models import User
 from wagtail.snippets.models import register_snippet
+from colorfield.fields import ColorField
+
+
+
+
+class Color(models.Model):
+    name = models.CharField(
+        max_length=128,
+        verbose_name='نام رنگ',
+        unique=True
+    )
+    hex_code = ColorField(default='#FF0000')
+
+    class Meta:
+        verbose_name = ("رنگ")
+        verbose_name_plural = ("رنگ ها")
+
+    def __str__(self):
+        return self.name
+
 
 @register_snippet
 class Picture (models.Model):
@@ -46,12 +66,13 @@ class ModelMobile (models.Model):
         verbose_name='برند'
     )
 
-    color = models.CharField(
-        max_length=255,
-        null=True,
+    colors = models.ManyToManyField(
+        Color,
         blank=True,
-        verbose_name='رنگ'
+        related_name='mobile_colors',
+        verbose_name='رنگ‌ها'
     )
+    
     picture = models.ManyToManyField(
         Picture,
         blank=True,

@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Picture, Product, Order, ModelMobile
+
+from .models import Picture, Product, Order, ModelMobile, Color
+
+
+@admin.register(Color)
+class CoLorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'hex_code')
 
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
@@ -50,14 +56,18 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(ModelMobile)
 class MobileAdmin(admin.ModelAdmin):
-    list_display = ('model_name', 'brand', 'color', 'is_apple', 'registered', 'link')
+    list_display = ('model_name', 'brand', 'get_colors', 'is_apple', 'registered', 'link')
     list_filter = ('is_apple', 'registered')
     ordering = ('-id',)
-    search_fields = ('model_name', 'brand', 'color', 'link')
+    search_fields = ('model_name', 'brand', 'link')
     fieldsets = (
-        (None, {'fields': ('model_name', 'brand', 'color', 'is_apple', 'registered', 'link')}),
+        (None, {'fields': ('model_name', 'brand', 'colors', 'is_apple', 'registered', 'link')}),
         ('تصاویر', {
             'fields': ('picture',)
         }),
     )
+    
+    def get_colors(self, obj):
+        return ', '.join([color.name for color in obj.colors.all()])
+    get_colors.short_description = 'رنگ‌ها'
 
