@@ -32,6 +32,13 @@ class PictureViewSet(APIView):
             serializer = PictureSerializer(pictures,many=True)
             return Response(serializer.data)
 
+class ModelMobileViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, id=None):
+        if id==None:
+           model_mobile = ModelMobile.objects.all()
+           serializer = MobileSerializer(model_mobile, many=True)
+        return Response(serializer.data)
 
 class ProductViewSet(APIView):
     permission_classes = [IsAuthenticated]
