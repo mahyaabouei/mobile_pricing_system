@@ -118,17 +118,22 @@ class Product (models.Model):
         null= True,
         blank= True,
         verbose_name='توضیحات')
+    
+    description_appearance = models.TextField(
+        null= True,
+        blank= True,
+        verbose_name='توضیحات ظاهر')
+    
+    technical_problem = models.BooleanField (
+        default= False,
+        verbose_name='مشکل فنی')
 
     price = models.BigIntegerField(
         null= True,
         blank= True,
         verbose_name='قیمت')
 
-    color =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='رنگ')
+    color =models.ForeignKey(Color,verbose_name='رنگ')
 
     picture = models.ManyToManyField(
         Picture,
@@ -137,23 +142,7 @@ class Product (models.Model):
         verbose_name='تصاویر'
     )
 
-    ram =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='حافظه داخلی')
-
-    sim_card =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='تعداد سیم کارت')
-
-    battry_health =models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='سلامت باتری')
+    battry_health =models.IntegerField(default=100,verbose_name='سلامت باتری')
 
     battry_change =models.BooleanField (
         default= False,
@@ -168,30 +157,30 @@ class Product (models.Model):
 
     type_product =models.CharField(
         max_length=25,
+        default="used",
         choices=TYPE_PRODUCT,
         null= True,
         blank= True,
         verbose_name='وضعیت محصول')
-
-    technical_problem = models.BooleanField (
+    
+    auction = models.BooleanField (
         default= False,
-        verbose_name='مشکل فنی')
-
-    hit_product = models.BooleanField (
-        default= False,
-        verbose_name='ضرب خوردگی'
+        verbose_name='مزایده'
     )
 
-    guarantor = models.CharField(
-        max_length=256,
-        null= True,
-        blank= True,
-        verbose_name='گارانتی')
+    guarantor = models.IntegerField(
+        default=0,
+        verbose_name='گارانتی ماه')
 
     repaired = models.BooleanField (
         default= False,
         verbose_name='تعمیر شده'
     )
+    part_num = models.CharField(
+        max_length=258,
+        null= True,
+        blank= True,
+        verbose_name='پارت نامبر')
 
     STATUS_PRODUCT =[
         ('open','باز'),
@@ -199,13 +188,10 @@ class Product (models.Model):
         ('canseled','کنسل شده'),
         ('reserved','رزرو'),
     ]
-
     status_product = models.CharField(
         max_length=25,
         choices=STATUS_PRODUCT,
         default='open',
-        null= True,
-        blank= True,
         verbose_name='وضعیت فروش محصول')
 
     CARTON = [
@@ -216,6 +202,7 @@ class Product (models.Model):
     carton = models.CharField(
         max_length=256,
         choices=CARTON,
+        default="orginal",
         null= True,
         blank= True,
         verbose_name='کارتن'
