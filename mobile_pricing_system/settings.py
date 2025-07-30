@@ -175,3 +175,6 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+
+WAGTAIL_SITE_NAME = 'شیک کالا'
