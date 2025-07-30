@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Picture, Product, Order
+from .models import Picture, Product, Order, ModelMobile
 
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
@@ -46,3 +46,18 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'sell_date')
     autocomplete_fields = ('product', 'buyer', 'seller')
     ordering = ('-sell_date',)
+
+
+@admin.register(ModelMobile)
+class MobileAdmin(admin.ModelAdmin):
+    list_display = ('model_name', 'brand', 'color', 'is_apple', 'registered', 'link')
+    list_filter = ('is_apple', 'registered')
+    ordering = ('-id',)
+    search_fields = ('model_name', 'brand', 'color', 'link')
+    fieldsets = (
+        (None, {'fields': ('model_name', 'brand', 'color', 'is_apple', 'registered', 'link')}),
+        ('تصاویر', {
+            'fields': ('picture',)
+        }),
+    )
+

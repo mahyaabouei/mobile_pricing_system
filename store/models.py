@@ -1,6 +1,8 @@
 from django.db import models
 from user.models import User
+from wagtail.snippets.models import register_snippet
 
+@register_snippet
 class Picture (models.Model):
     file = models.FileField(
         upload_to=('product/picture/'),
@@ -28,9 +30,7 @@ class Picture (models.Model):
     def __str__(self):
         return self.name
 
-
-
-
+@register_snippet
 class ModelMobile (models.Model):
     model_name = models.CharField(
         max_length=255,
@@ -92,9 +92,9 @@ class ModelMobile (models.Model):
         verbose_name_plural = ("موبایل ها")
 
     def __str__(self):
-        return self.name
+        return self.model_name
 
-
+@register_snippet
 class Product (models.Model):
     seller = models.ForeignKey(
         User,
@@ -234,7 +234,7 @@ class Product (models.Model):
     def __str__(self):
         return self.name
 
-
+@register_snippet
 class Order (models.Model) :
     product = models.ForeignKey(
         Product,

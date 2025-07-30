@@ -143,22 +143,3 @@ class StatisticViewSet(APIView):
         return Response({"orders_seller":orders_seller,"orders_buyer":orders_buyer,"products":products,"total_price_seller":total_price_seller,"total_price_buyer":total_price_buyer})
 
 
-# class MobileViewSet(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def get (self,request):
-#         mobiles = Mobile.objects.all()
-#         serializer = MobileSerializer(mobiles,many=True)
-#         return Response(serializer.data , status=status.HTTP_200_OK)
-
-#     def post (self,request):
-#         data = request.data
-#         if request.data.get('is_apple'):
-#             data['brand'] = 'apple'
-#         else:
-#             data['brand'] = request.data.get('brand')
-
-#         serializer = MobileSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data , status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
