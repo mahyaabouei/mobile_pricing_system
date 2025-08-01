@@ -6,6 +6,7 @@ from .models import Picture, Product, Order, ModelMobile, Color
 @admin.register(Color)
 class CoLorAdmin(admin.ModelAdmin):
     list_display = ('name', 'hex_code')
+    search_fields = ('name',)
 
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
@@ -15,40 +16,57 @@ class PictureAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ( 'seller', 'price', 'color', 'type_product', 'status_product', 'guarantor')
-    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired')
-    list_editable = ('status_product',)
-    ordering = ('-id',)
-    search_fields = ('description', 'color', 'ram', 'guarantor')
+    list_display = ('get_product_name', 'seller', 'price', 'color', 'type_product', 'status_product', 'guarantor', 'auction', 'created_at')
+    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired', 'auction', 'battry_change', 'carton', 'model_mobile')
+    list_editable = ('status_product', 'price')
+    ordering = ('-created_at',)
+    search_fields = ('description', 'part_num', 'seller__username')
+    autocomplete_fields = ('seller', 'model_mobile', 'color')
+    readonly_fields = ('created_at', 'updated_at')
     fieldsets = (
-        (None, {'fields': ( 'description', 'price', 'color')}),
+        (None, {
+            'fields': ('model_mobile', 'description', 'price', 'color')
+        }),
+        ('توضیحات تکمیلی', {
+            'fields': ('description_appearance', 'technical_problem'),
+            'classes': ('collapse',)
+        }),
         ('اطلاعات فنی', {
             'fields': (
-                'ram', 'sim_card',
                 'battry_health', 'battry_change',
-                'size'
+                'part_num', 'carton'
             )
         }),
         ('فروشنده', {
             'fields': ('seller',)
         }),
-        ('وضعیت محصول', {
+        ('وضعیت و تنظیمات', {
             'fields': (
-                'type_product', 'technical_problem',
-                'guarantor', 'repaired', 'status_product'
+                'type_product', 'status_product',
+                'guarantor', 'repaired', 'auction'
             )
         }),
         ('تصاویر', {
             'fields': ('picture',)
         }),
-
+        ('تاریخ‌ها', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
     )
+    
+    def get_product_name(self, obj):
+        if obj.model_mobile:
+            return f"{obj.model_mobile.brand} {obj.model_mobile.model_name}"
+        return f"محصول {obj.id}"
+
+    get_product_name.short_description = 'نام محصول'
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('product', 'buyer', 'seller', 'sell_date', 'status')
-    search_fields = ('product__name', 'buyer__username', 'seller__username')
+    search_fields = ('product__description', 'buyer__username', 'seller__username')
     list_filter = ('status', 'sell_date')
     autocomplete_fields = ('product', 'buyer', 'seller')
     ordering = ('-sell_date',)
@@ -61,7 +79,7 @@ class MobileAdmin(admin.ModelAdmin):
     ordering = ('-id',)
     search_fields = ('model_name', 'brand', 'link')
     fieldsets = (
-        (None, {'fields': ('model_name', 'brand', 'colors', 'is_apple', 'registered', 'link')}),
+        (None, {'fields': ('model_name', 'brand', 'colors', 'is_apple', 'link')}),
         ('تصاویر', {
             'fields': ('picture',)
         }),

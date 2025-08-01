@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 import datetime
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import PictureInputSerializer , ProductInputSerializer , OrderInputSerializer , ProductDetailSerializer
+from .serializers import PictureInputSerializer , ProductInputSerializer , OrderInputSerializer 
 from django.db.models import Sum
 
 class PictureViewSet(APIView):
@@ -45,9 +45,6 @@ class ProductViewSet(APIView):
     @extend_schema(request=ProductInputSerializer)
     def post (self,request):
         request.data['seller'] = request.user.id
-        print(request.data)
-        request.data['register_date'] = datetime.datetime.strptime(request.data['register_date'], '%Y-%m-%d') if request.data['register_date'] else None
-        request.data['status_product'] = 'open' if request.data['status_product'] is None else request.data['status_product']
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -57,7 +54,7 @@ class ProductViewSet(APIView):
     def get (self, request,id=None):
         if id :
             product = Product.objects.get(id=id)
-            serializer = ProductDetailSerializer(product)
+            serializer = ProductSerializer(product)
             return Response(serializer.data)
         else:
             products = Product.objects.all()

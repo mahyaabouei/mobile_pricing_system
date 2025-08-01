@@ -22,7 +22,7 @@ class Color(models.Model):
         return self.name
 
 
-@register_snippet
+
 class Picture (models.Model):
     file = models.FileField(
         upload_to=('product/picture/'),
@@ -48,9 +48,11 @@ class Picture (models.Model):
         verbose_name_plural = ("تصاویر")
 
     def __str__(self):
-        return self.name
+        if self.model_mobile:
+            return f"{self.model_mobile.brand} {self.model_mobile.model_name} - {self.seller.username if self.seller else 'بدون فروشنده'}"
+        return f"محصول {self.id}"
 
-@register_snippet
+
 class ModelMobile (models.Model):
     model_name = models.CharField(
         max_length=255,
@@ -104,7 +106,6 @@ class ModelMobile (models.Model):
     def __str__(self):
         return self.model_name
 
-@register_snippet
 class Product (models.Model):
     seller = models.ForeignKey(
         User,
@@ -124,9 +125,10 @@ class Product (models.Model):
         blank= True,
         verbose_name='توضیحات ظاهر')
     
-    technical_problem = models.BooleanField (
-        default= False,
-        verbose_name='مشکل فنی')
+    technical_problem = models.TextField(
+        null= True,
+        blank= True,
+        verbose_name='توضیحات مشکل فنی')
 
     price = models.BigIntegerField(
         null= True,
@@ -229,7 +231,7 @@ class Product (models.Model):
         permissions = [('can_create_products','می تواند محصولات را ایجاد کند'),('can_update_products','می تواند محصولات را بروزرسانی کند'),('can_delete_products','می تواند محصولات را حذف کند')]
 
     def __str__(self):
-        return self.name
+        return f"{self.id} - {self.model_mobile.model_name} - {self.price}"
 
 @register_snippet
 class Order (models.Model) :

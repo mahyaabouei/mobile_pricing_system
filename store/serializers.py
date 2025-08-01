@@ -2,26 +2,38 @@ from rest_framework import serializers
 from .models import Product , Order , Picture , ModelMobile, Color
 from user.serializers import UserSerializer
 
+
+
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Color
+        fields = ['id', 'name', 'hex_code']
+
+
+
+
+
 class PictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Picture
         fields = '__all__'
 
-class ProductSerializer(serializers.ModelSerializer):
-    picture = serializers.PrimaryKeyRelatedField(queryset=Picture.objects.all(), many=True)
-
-    class Meta:
-        model = Product
-        fields = ['picture' , 'name' ,'seller','price' , 'description' , 'id' , 'created_at' , 'updated_at' , 'color' , 'type_product'
-                  , 'technical_problem' , 'hit_product' , 'guarantor' , 'repaired' , 'status_product' ]
-
-class ProductDetailSerializer(serializers.ModelSerializer):
+class MobileSerializer(serializers.ModelSerializer):
     picture = PictureSerializer(many=True)
+    colors = ColorSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ModelMobile
+        fields = "__all__"
+
+class ProductSerializer(serializers.ModelSerializer):
+    picture = PictureSerializer()
+    model_mobile = MobileSerializer()
 
     class Meta:
         model = Product
-        fields = ['camera' , 'picture' , 'name' ,'seller','price' , 'description' , 'id' , 'created_at' , 'updated_at' , 'color' , 'type_product'
-                  , 'technical_problem' , 'hit_product' , 'guarantor' , 'repaired' , 'status_product' ]
+        fields = "__all__"
+
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -30,7 +42,7 @@ class OrderSerializer(serializers.ModelSerializer):
     seller = UserSerializer()
     class Meta:
         model = Order
-        fields = ['product' , 'buyer' , 'seller' , 'sell_date' , 'status' , 'id' , 'created_at' , 'updated_at' ]
+        fields = "__all__"
 
 class PictureInputSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, allow_blank=True)
@@ -66,16 +78,3 @@ class MobileInputSerializer(serializers.Serializer):
     registered = serializers.BooleanField(required=False)
     link = serializers.URLField(required=False, allow_blank=True)
 
-
-class ColorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Color
-        fields = ['id', 'name', 'hex_code']
-
-class MobileSerializer(serializers.ModelSerializer):
-    picture = PictureSerializer(many=True)
-    colors = ColorSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ModelMobile
-        fields = "__all__"
