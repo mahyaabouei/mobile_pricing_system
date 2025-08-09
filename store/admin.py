@@ -17,7 +17,7 @@ class PictureAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('get_product_name', 'seller', 'price', 'color', 'type_product', 'status_product', 'guarantor', 'auction', 'created_at')
-    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired', 'auction', 'battry_change', 'carton', 'model_mobile')
+    list_filter = ('type_product', 'status_product', 'guarantor', 'repaired', 'auction', 'battry_change', 'model_mobile')
     list_editable = ('status_product', 'price')
     ordering = ('-created_at',)
     search_fields = ('description', 'part_num', 'seller__username')

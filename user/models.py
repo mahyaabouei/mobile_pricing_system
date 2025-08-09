@@ -107,6 +107,32 @@ class User(AbstractUser):
 
     updated_at = models.DateTimeField(
         auto_now=True)
+    business_license = models.ImageField(
+        upload_to='business_license/',
+        null=True,
+        blank=True,
+        verbose_name='جواز')
+    head_store_image = models.ImageField(
+        upload_to='head_store_image/',
+        null=True,
+        blank=True,
+        verbose_name='تصویر تابلو فروشگاه')
+    store_window_image = models.ImageField(
+        upload_to='store_window_image/',
+        null=True,
+        blank=True,
+        verbose_name='تصویر ویترین فروشگاه')
+    Warranty_check_image = models.ImageField(
+        upload_to='Warranty_check_image/',
+        null=True,
+        blank=True,
+        verbose_name='تصویر چک ضمانت')
+    vip_sort = models.IntegerField(
+        default=0,
+        verbose_name='رتبه وی ای پی')
+        
+
+
 
     class Meta:
         verbose_name = 'کاربر'

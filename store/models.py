@@ -22,6 +22,24 @@ class Color(models.Model):
         return self.name
 
 
+class PardNumber (models.Model):
+    pard_number = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='پارت نمبر'
+    )
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name='توضیحات'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True)
+
+    updated_at = models.DateTimeField(
+        auto_now=True)
+
 
 class Picture (models.Model):
     file = models.FileField(
@@ -72,7 +90,7 @@ class ModelMobile (models.Model):
         Color,
         blank=True,
         related_name='mobile_colors',
-        verbose_name='رنگ‌ها'
+        verbose_name='رنگ‌ها',
     )
     
     picture = models.ManyToManyField(
@@ -102,6 +120,12 @@ class ModelMobile (models.Model):
     class Meta:
         verbose_name = ("موبایل")
         verbose_name_plural = ("موبایل ها")
+    def save(self, *args, **kwargs):
+        if self.is_apple:
+            self.brand = 'اپل'
+        if self.colors.count() == 0:
+            self.colors.add(Color.objects.all())
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.model_name
@@ -201,10 +225,18 @@ class Product (models.Model):
         ('repakage','رپیکیج'),
     ]
 
-    carton = models.CharField(
+    GRADE = [
+        ('A','در حد نو'),
+        ('B','خط و خش جزئی'),
+        ('C','خط و خش و ضربه جزئی'),
+        ('D','نیاز به تعمیر'),
+    ]
+
+
+    grade = models.CharField(
         max_length=256,
-        choices=CARTON,
-        default="orginal",
+        choices=GRADE,
+        default="A",
         null= True,
         blank= True,
         verbose_name='کارتن'
@@ -229,7 +261,7 @@ class Product (models.Model):
         verbose_name = ("محصول")
         verbose_name_plural = ("محصولات")
         permissions = [('can_create_products','می تواند محصولات را ایجاد کند'),('can_update_products','می تواند محصولات را بروزرسانی کند'),('can_delete_products','می تواند محصولات را حذف کند')]
-
+        ordering = ['-seller__vip_sort','-created_at']
     def __str__(self):
         return f"{self.id} - {self.model_mobile.model_name} - {self.price}"
 
