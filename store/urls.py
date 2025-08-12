@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PictureViewSet,ProductViewSet,OrderViewSet,StatisticViewSet, ModelMobileViewSet
+from .views import PictureViewSet,ProductViewSet,OrderViewSet,StatisticViewSet, ModelMobileViewSet, PardNumberViewSet
 
 urlpatterns = [
         path('picture/',PictureViewSet.as_view(),name='picture'),
@@ -10,4 +10,5 @@ urlpatterns = [
         path('order/' , OrderViewSet.as_view(), name='order'),
         path('order/<int:id>/' , OrderViewSet.as_view(), name='order'),
         path('statistic/' , StatisticViewSet.as_view(), name='statistic'),
+        path('pardnumber/' , PardNumberViewSet.as_view(), name='pardnumber'),
     ]

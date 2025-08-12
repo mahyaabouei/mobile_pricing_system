@@ -110,6 +110,26 @@ class ModelMobile (models.Model):
         blank=True,
         verbose_name='لینک'
     )
+    link_2 = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name='لینک دوم'
+    )
+    link_3 = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name='لینک سوم'
+    )
+    link_4 = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name='لینک  چهارم'
+    )
+    link_5 = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name='لینک  پنجم'
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True)
@@ -164,6 +184,7 @@ class Product (models.Model):
     picture = models.ManyToManyField(
         Picture,
         blank=True,
+        null=True,
         related_name='product_picture',
         verbose_name='تصاویر'
     )
@@ -239,7 +260,7 @@ class Product (models.Model):
         default="A",
         null= True,
         blank= True,
-        verbose_name='کارتن'
+        verbose_name='درجه'
     )
 
     model_mobile = models.ForeignKey(

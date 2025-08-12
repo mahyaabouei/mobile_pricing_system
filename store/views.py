@@ -1,5 +1,5 @@
-from .models import Picture , Product , Order , ModelMobile
-from .serializers import PictureSerializer , ProductSerializer , OrderSerializer , MobileSerializer
+from .models import Picture , Product , Order , ModelMobile, PardNumber
+from .serializers import PictureSerializer , ProductSerializer , OrderSerializer , MobileSerializer, PardNumberSerializer
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 import datetime
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import PictureInputSerializer , ProductInputSerializer , OrderInputSerializer 
+from .serializers import PictureInputSerializer , ProductInputSerializer , OrderInputSerializer, ProductReadSerializer
 from django.db.models import Sum
 
 class PictureViewSet(APIView):
@@ -45,6 +45,9 @@ class ProductViewSet(APIView):
     @extend_schema(request=ProductInputSerializer)
     def post (self,request):
         request.data['seller'] = request.user.id
+        request.data['model_mobile'] = id=request.data.get('model_mobile',{}).get('id')
+        print(request.data)
+
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -54,11 +57,11 @@ class ProductViewSet(APIView):
     def get (self, request,id=None):
         if id :
             product = Product.objects.get(id=id)
-            serializer = ProductSerializer(product)
+            serializer = ProductReadSerializer(product)
             return Response(serializer.data)
         else:
             products = Product.objects.all()
-            serializer = ProductSerializer(products,many=True)
+            serializer = ProductReadSerializer(products,many=True)
             return Response(serializer.data)
 
 
@@ -147,3 +150,9 @@ class StatisticViewSet(APIView):
         return Response({"orders_seller":orders_seller,"orders_buyer":orders_buyer,"products":products,"total_price_seller":total_price_seller,"total_price_buyer":total_price_buyer})
 
 
+class PardNumberViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+    def get (self,request):
+        pard_number = PardNumber.objects.all()
+        serializer = PardNumberSerializer(pard_number,many=True)
+        return Response(serializer.data)

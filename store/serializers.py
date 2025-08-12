@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product , Order , Picture , ModelMobile, Color
+from .models import Product , Order , Picture , ModelMobile, Color, PardNumber
 from user.serializers import UserSerializer
 
 
@@ -9,8 +9,10 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = ['id', 'name', 'hex_code']
 
-
-
+class PardNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PardNumber
+        fields = "__all__"
 
 
 class PictureSerializer(serializers.ModelSerializer):
@@ -27,8 +29,25 @@ class MobileSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductSerializer(serializers.ModelSerializer):
-    picture = PictureSerializer()
-    model_mobile = MobileSerializer()
+    picture = PictureSerializer(many=True, required=False)
+    model_mobile = MobileSerializer(required=False)
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+class ProductSerializer(serializers.ModelSerializer):
+    picture = PictureSerializer(many=True, required=False)
+    model_mobile = serializers.PrimaryKeyRelatedField(queryset=ModelMobile.objects.all())
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+
+class ProductReadSerializer(serializers.ModelSerializer):
+    picture = PictureSerializer(many=True, read_only=True)
+    model_mobile = MobileSerializer(read_only=True)
 
     class Meta:
         model = Product

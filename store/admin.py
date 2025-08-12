@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Picture, Product, Order, ModelMobile, Color
+from .models import Picture, Product, Order, ModelMobile, Color, PardNumber
 
 
 @admin.register(Color)
@@ -89,3 +89,9 @@ class MobileAdmin(admin.ModelAdmin):
         return ', '.join([color.name for color in obj.colors.all()])
     get_colors.short_description = 'رنگ‌ها'
 
+@admin.register(PardNumber)
+class PardNumberAdmin(admin.ModelAdmin):
+    list_display = ('pard_number', 'description', 'created_at', 'updated_at')
+    search_fields = ('pard_number', 'description')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
