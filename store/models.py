@@ -40,6 +40,9 @@ class PardNumber (models.Model):
     updated_at = models.DateTimeField(
         auto_now=True)
 
+    class Meta:
+        verbose_name = ("پارت نامبر")
+        verbose_name_plural = ("پارت نامبر ها")
 
 class Picture (models.Model):
     file = models.FileField(

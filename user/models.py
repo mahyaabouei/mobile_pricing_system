@@ -130,8 +130,6 @@ class User(AbstractUser):
     vip_sort = models.IntegerField(
         default=0,
         verbose_name='رتبه وی ای پی')
-        
-
 
 
     class Meta:
@@ -147,6 +145,8 @@ class User(AbstractUser):
             exists = User.objects.exclude(pk=self.pk).filter(uniqidentifier=self.uniqidentifier).exists()
             if exists:
                 raise ValidationError({'uniqidentifier': 'این کد ملی قبلاً استفاده شده است.'})
+
+
 
 @register_snippet
 class Otp(models.Model):

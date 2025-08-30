@@ -43,16 +43,31 @@ class ModelMobileViewSet(APIView):
 class ProductViewSet(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(request=ProductInputSerializer)
-    def post (self,request):
+    def post(self, request):
         request.data['seller'] = request.user.id
-        request.data['model_mobile'] = id=request.data.get('model_mobile',{}).get('id')
-        print(request.data)
+
+        # 🟢 model_mobile فقط id بمونه
+        model_mobile_data = request.data.get('model_mobile', None)
+        if isinstance(model_mobile_data, dict):
+            request.data['model_mobile'] = model_mobile_data.get('id')
+        else:
+            request.data['model_mobile'] = model_mobile_data
+
+        # 🟢 picture: فقط id ها بمونن
+        pictures = request.data.get('picture', [])
+        if isinstance(pictures, list):
+            request.data['picture'] = [p.get('id') if isinstance(p, dict) else p for p in pictures if p]
+
+        # 🟢 کلید اشتباه "pictures" رو حذف کن
+        if 'pictures' in request.data:
+            request.data.pop('pictures')
 
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            product = serializer.save()
+            return Response(ProductSerializer(product).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get (self, request,id=None):
         if id :

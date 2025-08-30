@@ -37,12 +37,19 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductSerializer(serializers.ModelSerializer):
-    picture = PictureSerializer(many=True, required=False)
-    model_mobile = serializers.PrimaryKeyRelatedField(queryset=ModelMobile.objects.all())
+    picture = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Picture.objects.all(),
+        required=False
+    )
+    model_mobile = serializers.PrimaryKeyRelatedField(
+        queryset=ModelMobile.objects.all()
+    )
 
     class Meta:
         model = Product
         fields = "__all__"
+
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
